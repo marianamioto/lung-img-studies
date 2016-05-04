@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+"""Esta funcao eh onde pretendo chamar todas as funcoes que fazem o
+processamento (seguindo a metodologia descrita no texto da quali ), quando elas
+estiverem prontas"""
 
-:import pydicom
+import pydicom
 import numpy
 import pylab
 import os

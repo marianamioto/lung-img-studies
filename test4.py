@@ -28,10 +28,10 @@ def segmentation(image):
 #ax0.set_title('Image')
 
 #ax1.imshow(binary_global)
-#ax1.set_title('Li  thresholding')
+#ax1.set_title('Otsu')
 
 #ax2.imshow(binary_adaptive)
-#ax2.set_title('Adaptive thresholding')
+#ax2.set_title('Adaptativo')
 
 #for ax in axes:
 #    ax.axis('off')

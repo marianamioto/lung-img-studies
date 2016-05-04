@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Esta funcao realiza um contorno simples da imagem"""
+
 
 import PIL
 import pydicom
@@ -31,7 +33,7 @@ def filterSobel(ds):
 
 
 if __name__ == "__main__":
-    ds=pydicom.read_file("/Users/Mariana/Desktop/IM-0001-0033-0001.dcm")
-    contours(ds)
+    ds=pydicom.read_file("/Users/Mariana/Desktop/CT-0015.dcm")
+    #contours(ds)
     display(ds)
     #filterSobel(ds)
