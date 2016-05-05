@@ -10,12 +10,11 @@ import os
 
 from test4 import segmentation
 from contours import contours_segm
-
-
-#mostrar dicom com PIL
 from pydicom.contrib.pydicom_PIL import show_PIL
 from skimage import exposure, img_as_ubyte
 from getRNU import getRNU
+from getFiles import getFiles
+
 
 def display(image):
     image_array = exposure.rescale_intensity(image,
@@ -31,14 +30,15 @@ def display(image):
 #max = ds.pixel_array.max()
 
 #abre exame no diretorio especificado e armazena em uma lista os nomes de exames
-PathDicom = "/Users/Mariana/Desktop/ILDdatabase/ILD_DB_txtROIs/3"
+#PathDicom = "/Users/Mariana/Desktop/ILDdatabase/ILD_DB_txtROIs/3"
 
 lstFilesDCM = []
-for dirName, subdirList, fileList in os.walk(PathDicom):
-    for filename in fileList:
-        if ".dcm" in filename.lower():
-            lstFilesDCM.append(os.path.join(dirName,filename))
+#for dirName, subdirList, fileList in os.walk(PathDicom):
+   # for filename in fileList:
+       # if ".dcm" in filename.lower():
+           # lstFilesDCM.append(os.path.join(dirName,filename))
 
+lstFilesDCM = getFiles()
 for fileDCM in lstFilesDCM:
     ds=pydicom.read_file(fileDCM)
     image = ds.pixel_array
