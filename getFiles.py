@@ -3,7 +3,7 @@
 import os
 
 def getFiles():
-    PathDicom = "/Users/Mariana/Desktop/ILDdatabase/ILD_DB_txtROIs/3"
+    PathDicom = "/Users/Mariana/Desktop/ILDdatabase/45"
 
     lstFilesDCM = []
     for dirName, subdirList, fileList in os.walk(PathDicom):

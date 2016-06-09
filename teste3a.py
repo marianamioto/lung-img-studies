@@ -3,12 +3,8 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import dicom
-import numpy
-from skimage.data import camera
 
 from skimage.filters import threshold_otsu
-
-from teste2a import contours
 
 matplotlib.rcParams['font.size'] = 9
 
