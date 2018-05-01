@@ -9,11 +9,13 @@ import pydicom
 from scipy import ndimage as ndi
 from skimage import morphology
 from skimage.color import label2rgb
+from skimage.feature import canny
+from skimage.filters import sobel
 from skimage.measure import label
 
 
 def single_gray_plot(pixel_array, title=None):
-    fig, ax = plt.subplots(figsize=(4, 3))
+    fig, ax = plt.subplots(figsize=(12, 9))
     ax.imshow(pixel_array, cmap=plt.cm.gray, interpolation='nearest')
     ax.axis('off')
     if title:
@@ -41,20 +43,25 @@ def open_dicom_image(image_path):
 
 
 def extract_markers(pixel_array):
-    levels = pixel_array.max()
 
-    markers = np.zeros_like(pixel_array/levels)
-    markers[pixel_array < 600] = 1  # TODO: move to const
-    markers[pixel_array > 2800] = 0  # TODO: move to const
+    # When using watershed we need to have at least two different markers.
+    #   Zero means not a marker.
+    markers = np.zeros_like(pixel_array)
+    markers[pixel_array < 700] = 1  # TODO: move to const
+    markers[pixel_array > 800] = 2  # TODO: move to const
+    # markers[pixel_array > 2000] = 3  # TODO: move to const
     return markers
 
 
 def remove_small_holes(pixel_array):
-    fill_lugs = label(pixel_array, return_num=False)
+    #fill_lungs = label(
+    #    pixel_array,
+    #    return_num=False,
+    #)
+    #single_gray_plot(fill_lungs)
     return morphology.remove_small_holes(
-        fill_lugs,
+        pixel_array,
         500,  # TODO: move to const
-        connectivity=1,
     )
 
 
@@ -68,6 +75,28 @@ def label_features(cleaned_image, original_image):
     )
 
 
+def apply_watershed(pixel_array):
+    elavation_map = sobel(pixel_array)
+    single_gray_plot(elavation_map, 'Elevation Map')
+
+    # markers = remove_small_holes(pixel_array)
+    # single_gray_plot(markers, 'Markers no holes')
+
+    markers = extract_markers(pixel_array)
+    single_gray_plot(markers, 'Markers')
+
+    segmentation = morphology.watershed(elavation_map, markers)
+    single_gray_plot(segmentation, 'watershed')
+
+    bin_filled = ndi.binary_fill_holes(segmentation - 1)
+    seg_minus_filled = (segmentation - bin_filled)
+    single_gray_plot(seg_minus_filled, 'seg - filled')
+
+    single_gray_plot(morphology.convex_hull_object(seg_minus_filled - 1), 'convex_hull_image')
+    single_gray_plot(remove_small_holes(morphology.dilation(seg_minus_filled -1)), 'dilation')
+
+
+
 def main():
     try:
         image_path = sys.argv[1]
@@ -76,22 +105,16 @@ def main():
         sys.exit(1)
 
     dicom_image = open_dicom_image(image_path)
+    single_gray_plot(dicom_image.pixel_array)
 
-    markers = extract_markers(dicom_image.pixel_array)
-    single_gray_plot(markers, 'Markers')
+    segmented_image = apply_watershed(dicom_image.pixel_array)
+    single_gray_plot(segmented_image)
 
-    removed_small_holes = remove_small_holes(markers)
-    single_gray_plot(removed_small_holes, 'Removed Small Holes')
-
-    features_labeled = label_features(removed_small_holes,
-                                      dicom_image.pixel_array)
-    single_gray_plot(features_labeled)
-
-    plot_results(
-        dicom_image.pixel_array,
-        removed_small_holes,
-        features_labeled,
-    )
+    # plot_results(
+    #     dicom_image.pixel_array,
+    #     removed_small_holes,
+    #     features_labeled,
+    # )
 
 
 if __name__ == '__main__':
